@@ -1,6 +1,6 @@
-import { Component, SystemStateComponent, System, createType } from 'https://unpkg.com/ecsy@0.2.6/build/ecsy.module.js';
-import { Object3DComponent, Transform, Parent } from 'https://unpkg.com/ecsy-three@0.0.4/build/ecsy-three.module.js';
-import { DataTexture, RGBFormat, TextureLoader, InstancedBufferGeometry, BufferGeometry, ShaderLib, UniformsUtils, ShaderMaterial, Mesh, Points, Float32BufferAttribute, Matrix4, Texture, NormalBlending, InstancedBufferAttribute, MathUtils, Vector3, Quaternion, Euler } from 'https://unpkg.com/three@0.118.1/build/three.module.js';
+import { Component, SystemStateComponent, System, createType } from 'https://unpkg.com/ecsy@0.3.1/build/ecsy.module.js';
+import { Object3DComponent, Transform, Parent } from 'https://unpkg.com/ecsy-three@0.0.6/build/ecsy-three.module.js';
+import { DataTexture, RGBFormat, TextureLoader, InstancedBufferGeometry, BufferGeometry, ShaderLib, UniformsUtils, ShaderMaterial, Mesh, Points, Float32BufferAttribute, Matrix4, Texture, NormalBlending, InstancedBufferAttribute, MathUtils, Vector3, Quaternion, Euler } from 'https://unpkg.com/three@0.118.3/build/three.module.js';
 
 class Keyframe extends Component {
   constructor() {

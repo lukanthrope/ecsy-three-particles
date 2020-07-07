@@ -3,11 +3,11 @@
   <head>
     <title>ECSY Particles</title>
     <script type="module">
-      import * as THREE from "https://unpkg.com/three@0.117.0/build/three.module.js"
-      import * as ECSY from "https://unpkg.com/ecsy@0.2.6/build/ecsy.module.js"
-      import * as ECSYTHREE from "./vendor/ecsy-three.module-unpkg.js"
-      import * as PARTICLES from "./ecsy-three-particles.module-unpkg-ecsy-three-fix.js"
-      import WebXRPolyfill from "https://unpkg.com/webxr-polyfill@latest/build/webxr-polyfill.module.js"
+      import * as THREE from "three"
+      import * as ECSY from "ecsy"
+      import * as ECSYTHREE from "ecsy-three"
+      import * as PARTICLES from "../dist/ecsy-particles.js"
+      import WebXRPolyfill from "webxr-polyfill"
 
       new WebXRPolyfill()
 
