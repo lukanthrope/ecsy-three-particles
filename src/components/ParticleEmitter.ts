@@ -1,10 +1,17 @@
 import { Component, SystemStateComponent } from "ecsy"
 
-export class ParticleEmitterState extends SystemStateComponent {
+interface ParticleEmitterStateInterface {
   emitter3D: any
   useEntityRotation: boolean
   syncTransform: boolean
-  constructor() {
+  reset(): void
+}
+
+export class ParticleEmitterState extends SystemStateComponent<ParticleEmitterStateInterface> {
+  emitter3D: any
+  useEntityRotation: boolean
+  syncTransform: boolean
+  constructor(args: any) {
     super()
     this.reset()
   }
@@ -16,7 +23,7 @@ export class ParticleEmitterState extends SystemStateComponent {
   }
 }
 
-export class ParticleEmitter extends Component {
+interface ParticleEmitterInterface {
   particleMesh: any
   enabled: boolean
   count: number
@@ -47,7 +54,42 @@ export class ParticleEmitter extends Component {
   worldAcceleration: { x: number; y: number; z: number }
   brownianSpeed: number
   brownianScale: number
-  constructor() {
+  reset(): void
+  copy(src): any
+}
+
+export class ParticleEmitter extends Component<ParticleEmitterInterface> {
+  particleMesh: any
+  enabled: boolean
+  count: number
+  atlas: string
+  textureFrame: any
+  frames: any[]
+  lifeTime: number
+  repeatTime: number
+  spawnVariance: number
+  burst: number
+  syncTransform: boolean
+  useEntityRotation: boolean
+  worldUp: boolean
+  colors: { r: number; g: number; b: number }[]
+  orientations: number[]
+  scales: number[]
+  opacities: number[]
+  frameStyle: string
+  offset: { x: number; y: number; z: number }
+  velocity: { x: number; y: number; z: number }
+  acceleration: { x: number; y: number; z: number }
+  radialVelocity: number
+  radialAcceleration: number
+  angularVelocity: { x: number; y: number; z: number }
+  angularAcceleration: { x: number; y: number; z: number }
+  orbitalVelocity: number
+  orbitalAcceleration: number
+  worldAcceleration: { x: number; y: number; z: number }
+  brownianSpeed: number
+  brownianScale: number
+  constructor(args: any) {
     super()
     this.reset()
   }

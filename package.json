@@ -71,7 +71,7 @@
     "preversion": "npm run lint",
     "version": "npm run build && git add -A",
     "postversion": "git push && git push --tags && sudo npm publish",
-    "dev": "rollup -cw",
+    "dev": "rollup -cw --sourcemap",
     "lint": "eslint ./src/**/*",
     "start": "npm run build"
   },

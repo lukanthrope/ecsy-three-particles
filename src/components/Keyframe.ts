@@ -1,6 +1,13 @@
 import { Component } from "ecsy"
 
-export class Keyframe extends Component {
+interface KeyframeInterface {
+  attributes: any[]
+  duration: number
+  direction: string
+  reset(): void
+}
+
+export class Keyframe extends Component<KeyframeInterface> {
   attributes: any[]
   duration: number
   direction: string

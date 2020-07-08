@@ -29,5 +29,10 @@ export default [
     input: "examples/index.html",
     output: { dir: "dist/examples" },
     plugins: [html(), resolve()]
+  },
+  {
+    input: "examples/index-not-vr.html",
+    output: { dir: "dist/examples" },
+    plugins: [html(), resolve()]
   }
 ]
