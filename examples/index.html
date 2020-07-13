@@ -67,10 +67,14 @@
       }
 
       const world = new ECSYTHREE.ECSYThreeWorld()
-        .registerSystem(ECSYTHREE.VRControllerSystem)
-        .registerSystem(PARTICLES.ParticleSystem)
+        .registerSystem(ECSYTHREEX.VRControllerSystem)
         .registerSystem(RotatingSystem)
         .registerSystem(TranslatingSystem)
+        .registerComponent(ECSYTHREEX.Transform)
+        .registerComponent(Rotating)
+        .registerComponent(Translating)
+
+      PARTICLES.initializeParticleSystem(world)
 
       const data = ECSYTHREEX.initialize(world, { vr: true })
 
@@ -79,7 +83,7 @@
       for (let id = 0; id <= 1; id++) {
         world
           .createEntity()
-          .addComponent(ECSYTHREE.VRController, { id })
+          .addComponent(ECSYTHREEX.VRController, { id })
           .addComponent(ECSYTHREEX.Parent, { value: scene })
       }
 
