@@ -118,8 +118,9 @@ export function createParticleEmitter(options, matrixWorld, time = 0) {
   }
 
   needsUpdate(geometry)
-
-  loadTexturePackerJSON(mesh, config, startIndex, endIndex)
+  if (mesh.userData.meshConfig.style === 'particle') {
+    loadTexturePackerJSON(mesh, config, startIndex, endIndex)
+  }
 
   return { startTime, startIndex, endIndex, mesh }
 }

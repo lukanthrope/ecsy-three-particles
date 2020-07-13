@@ -312,6 +312,12 @@ export function loadTexturePackerJSON(mesh, config, startIndex, endIndex): any {
     /\.[^\.]+$/,
     ".json"
   )
+
+  if (!jsonFilename) {
+    // console.warn('meshConfig.texture is empty', mesh.userData.meshConfig.texture)
+    return
+  }
+
   fetch(jsonFilename)
     .then(response => {
       return response.json()

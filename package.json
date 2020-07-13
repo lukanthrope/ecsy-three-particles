@@ -50,7 +50,7 @@
     "rollup-plugin-serve": "^1.0.1",
     "rollup-plugin-terser": "^5.1.2",
     "rollup-plugin-typescript2": "^0.27.1",
-    "three": "^0.118.3",
+    "three": "^0.116.1",
     "troika-3d-text": "^0.28.1",
     "tslib": "^2.0.0",
     "typescript": "^3.9.5"

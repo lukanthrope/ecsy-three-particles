@@ -83,18 +83,6 @@ export class ParticleEmitter extends Component<ParticleEmitterInterface> {
   worldAcceleration: { x: number; y: number; z: number }
   brownianSpeed: number
   brownianScale: number
-  // constructor() {
-  //   super()
-  //   // this.reset()
-  // }
-
-  // reset(): void {
-
-  // }
-
-  // copy(src): any {
-  //   Object.defineProperties(this, Object.getOwnPropertyDescriptors(src)) // preserves getters
-  // }
 }
 
 ParticleEmitter.schema = {
