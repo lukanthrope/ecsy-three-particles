@@ -227,7 +227,7 @@ export function updateGeometry(geometry, config) {
   }
 
   if ("maxInstancedCount" in geometry) {
-    geometry.maxInstancedCount = particleCount
+    geometry.instanceCount = particleCount
   }
 
   const identity = new THREE.Matrix4()
