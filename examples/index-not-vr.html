@@ -16,6 +16,7 @@
       import * as ECSYTHREE from "ecsy-three"
       import * as ECSYTHREEX from "ecsy-three/extras"
       import * as PARTICLES from "../dist/ecsy-particles.js"
+      import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 
       const DEG2RAD = THREE.MathUtils.DEG2RAD
 
@@ -93,8 +94,13 @@
       // }
 
       const cam = camera.getComponent(ECSYTHREE.Object3DComponent)["value"]
-      cam.position.set(-1,0.5,-1).multiplyScalar(0.5)
-      cam.lookAt(new THREE.Vector3())
+      cam.position.set(-1,0.5,-1).multiplyScalar(5)
+      cam.lookAt(new THREE.Vector3(0,0.5,-4))
+
+      setTimeout(() => {
+        const domElement = document.body.querySelector("canvas")
+        const controls = new OrbitControls(cam, domElement)
+      }, 0)
 
       const coneGeo = new THREE.ConeBufferGeometry()
       const coneMesh = new THREE.Mesh(

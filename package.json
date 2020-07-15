@@ -40,7 +40,7 @@
     "pre-commit": "^1.2.2",
     "prettier": "^1.19.1",
     "prettier-eslint": "^11.0.0",
-    "rollup": "^1.27.13",
+    "rollup": "^2.21.0",
     "rollup-plugin-auto-external": "^2.0.0",
     "rollup-plugin-external-globals": "^0.5.0",
     "rollup-plugin-html": "^0.2.1",
@@ -72,7 +72,8 @@
     "preversion": "npm run lint",
     "version": "npm run build && git add -A",
     "postversion": "git push && git push --tags && sudo npm publish",
-    "dev": "rollup -cw --sourcemap",
+    "dev": "rollup -c --watch --sourcemap",
+    "dev-examples": "rollup --config rollup-examples.config.js --watch --sourcemap",
     "lint": "eslint ./src/**/*",
     "start": "npm run build"
   },

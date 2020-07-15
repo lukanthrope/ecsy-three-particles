@@ -23,7 +23,7 @@ export default [
       {
         file: pkg.module,
         format: "es",
-        sourcemap: true
+        sourcemap: true,
       }
     ]
   },
@@ -37,5 +37,12 @@ export default [
     input: "examples/index-not-vr.html",
     output: { dir: "dist/examples" },
     plugins: [html(), resolve()]
+  },
+  {
+    input: "examples/firework.html",
+    output: { dir: "dist/examples" },
+    plugins: [html(), resolve()],
+    watch: {
+    },
   }
 ]
