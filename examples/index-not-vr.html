@@ -2,15 +2,21 @@
 <html>
   <head>
     <title>ECSY Particles</title>
+    <style>
+      html, body {
+        margin: 0;
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+      }
+    </style>
     <script type="module">
       import * as THREE from "three"
       import * as ECSY from "ecsy"
       import * as ECSYTHREE from "ecsy-three"
       import * as ECSYTHREEX from "ecsy-three/extras"
       import * as PARTICLES from "../dist/ecsy-particles.js"
-      import WebXRPolyfill from "webxr-polyfill"
-
-      new WebXRPolyfill()
+      import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 
       const DEG2RAD = THREE.MathUtils.DEG2RAD
 
@@ -48,7 +54,7 @@
       }
 
       class TranslatingSystem extends ECSY.System {
-        execute(dt) {
+        execute(dt, t) {
           for (let entity of this.queries.translating.results) {
             const translating = entity.getComponent(Translating)
             /** @type {ECSYTHREEX.Transform} */
@@ -67,7 +73,7 @@
       }
 
       const world = new ECSYTHREE.ECSYThreeWorld()
-        .registerSystem(ECSYTHREEX.VRControllerSystem)
+        // .registerSystem(ECSYTHREE.VRControllerSystem)
         .registerSystem(RotatingSystem)
         .registerSystem(TranslatingSystem)
         .registerComponent(ECSYTHREEX.Transform)
@@ -76,16 +82,25 @@
 
       PARTICLES.initializeParticleSystem(world)
 
-      const data = ECSYTHREEX.initialize(world, { vr: true })
+      const data = ECSYTHREEX.initialize(world, { vr: false })
 
       const { scene, renderer, camera } = data.entities
 
-      for (let id = 0; id <= 1; id++) {
-        world
-          .createEntity()
-          .addComponent(ECSYTHREEX.VRController, { id })
-          .addComponent(ECSYTHREEX.Parent, { value: scene })
-      }
+      // for (let id = 0; id <= 1; id++) {
+      //   world
+      //     .createEntity()
+      //     // .addComponent(ECSYTHREE.VRController, { id })
+      //     .addComponent(ECSYTHREEX.Parent, { value: scene })
+      // }
+
+      const cam = camera.getComponent(ECSYTHREE.Object3DComponent)["value"]
+      cam.position.set(-1,0.5,-1).multiplyScalar(5)
+      cam.lookAt(new THREE.Vector3(0,0.5,-4))
+
+      setTimeout(() => {
+        const domElement = document.body.querySelector("canvas")
+        const controls = new OrbitControls(cam, domElement)
+      }, 0)
 
       const coneGeo = new THREE.ConeBufferGeometry()
       const coneMesh = new THREE.Mesh(
@@ -493,7 +508,7 @@
         .createEntity()
         .addComponent(PARTICLES.ParticleEmitter, {
           particleMesh: coneParticleMesh,
-          // atlas: 'blob.png',
+          atlas: 'blob.png',
           count: 200,
           lifeTime: 5,
           get offset() {

@@ -4,12 +4,14 @@ export * from "./three/ParticleEmitter"
 export * from "./three/ParticleMesh"
 export * from "./Keyframes"
 export * from "./Math"
-export * from "./Types"
+//export * from "./Types"
 export * from "./Util"
 
 import { isBrowser } from "./Util"
 
 import { World } from "ecsy"
+import {ParticleSystem} from "./systems";
+import {ParticleEmitter, ParticleEmitterState} from "./components";
 
 const DEFAULT_OPTIONS = {
   mouse: true,
@@ -35,7 +37,10 @@ export function initializeParticleSystem(
     console.log(options)
   }
 
-  // TODO: Do stuff here
+  world
+      .registerSystem(ParticleSystem)
+      .registerComponent(ParticleEmitterState)
+      .registerComponent(ParticleEmitter)
 
   if (options.debug) console.log("INPUT: Registered particle system.")
 }
