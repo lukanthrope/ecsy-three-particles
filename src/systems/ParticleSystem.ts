@@ -5,7 +5,8 @@ import {
 } from "../components/ParticleEmitter"
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import { Object3DComponent, Transform, Parent } from "ecsy-three"
+import { Object3DComponent } from "ecsy-three"
+import { Transform, Parent } from "ecsy-three/extras"
 import * as THREE from "three"
 import {
   createParticleEmitter,

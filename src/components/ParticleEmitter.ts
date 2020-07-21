@@ -1,22 +1,25 @@
-import { Component, SystemStateComponent } from "ecsy"
+import {Component, SystemStateComponent, Types} from "ecsy"
 
-export class ParticleEmitterState extends SystemStateComponent {
+interface ParticleEmitterStateInterface {
   emitter3D: any
   useEntityRotation: boolean
   syncTransform: boolean
-  constructor() {
-    super()
-    this.reset()
-  }
-
-  reset() {
-    this.emitter3D = undefined
-    this.useEntityRotation = true
-    this.syncTransform = false
-  }
 }
 
-export class ParticleEmitter extends Component {
+export class ParticleEmitterState extends SystemStateComponent<ParticleEmitterStateInterface> {
+  emitter3D: any
+  useEntityRotation: boolean
+  syncTransform: boolean
+}
+
+ParticleEmitterState.schema = {
+  ... ParticleEmitterState.schema,
+  emitter3D: { type: Types.Ref },
+  useEntityRotation: { type: Types.Boolean, default: true },
+  syncTransform: { type: Types.Boolean, default: false }
+};
+
+interface ParticleEmitterInterface {
   particleMesh: any
   enabled: boolean
   count: number
@@ -47,46 +50,72 @@ export class ParticleEmitter extends Component {
   worldAcceleration: { x: number; y: number; z: number }
   brownianSpeed: number
   brownianScale: number
-  constructor() {
-    super()
-    this.reset()
-  }
-
-  reset(): void {
-    this.particleMesh = null
-    this.enabled = true
-    this.count = -1
-    this.atlas = ""
-    this.textureFrame = undefined
-    this.frames = []
-    this.lifeTime = 1
-    this.repeatTime = 0
-    this.spawnVariance = 0
-    this.burst = 0
-    this.syncTransform = false
-    this.useEntityRotation = true
-    this.worldUp = false
-    // randomizable values
-    this.colors = [{ r: 1, g: 1, b: 1 }]
-    this.orientations = [0]
-    this.scales = [1]
-    this.opacities = [1]
-    this.frameStyle = "sequence"
-    this.offset = { x: 0, y: 0, z: 0 }
-    this.velocity = { x: 0, y: 0, z: 0 }
-    this.acceleration = { x: 0, y: 0, z: 0 }
-    this.radialVelocity = 0
-    this.radialAcceleration = 0
-    this.angularVelocity = { x: 0, y: 0, z: 0 }
-    this.angularAcceleration = { x: 0, y: 0, z: 0 }
-    this.orbitalVelocity = 0
-    this.orbitalAcceleration = 0
-    this.worldAcceleration = { x: 0, y: 0, z: 0 }
-    this.brownianSpeed = 0
-    this.brownianScale = 0
-  }
-
-  copy(src): any {
-    Object.defineProperties(this, Object.getOwnPropertyDescriptors(src)) // preserves getters
-  }
 }
+
+export class ParticleEmitter extends Component<ParticleEmitterInterface> {
+  particleMesh: any
+  enabled: boolean
+  count: number
+  atlas: string
+  textureFrame: any
+  frames: any[]
+  lifeTime: number
+  repeatTime: number
+  spawnVariance: number
+  burst: number
+  syncTransform: boolean
+  useEntityRotation: boolean
+  worldUp: boolean
+  colors: { r: number; g: number; b: number }[]
+  orientations: number[]
+  scales: number[]
+  opacities: number[]
+  frameStyle: string
+  offset: { x: number; y: number; z: number }
+  velocity: { x: number; y: number; z: number }
+  acceleration: { x: number; y: number; z: number }
+  radialVelocity: number
+  radialAcceleration: number
+  angularVelocity: { x: number; y: number; z: number }
+  angularAcceleration: { x: number; y: number; z: number }
+  orbitalVelocity: number
+  orbitalAcceleration: number
+  worldAcceleration: { x: number; y: number; z: number }
+  brownianSpeed: number
+  brownianScale: number
+}
+
+ParticleEmitter.schema = {
+  ... ParticleEmitter.schema,
+  particleMesh: { type: Types.Ref, default: null },
+  enabled: { type: Types.Boolean, default: true },
+  count: { type: Types.Number, default: -1 },
+  atlas: { type: Types.String, default: "" },
+  textureFrame: { type: Types.Ref, default: undefined },
+  frames: { type: Types.Array, default: [] },
+  lifeTime: { type: Types.Number, default: 1 },
+  repeatTime: { type: Types.Number, default: 0 },
+  spawnVariance: { type: Types.Number, default: 0 },
+  burst: { type: Types.Number, default: 0 },
+  syncTransform: { type: Types.Boolean, default: false },
+  useEntityRotation: { type: Types.Boolean, default: true },
+  worldUp: { type: Types.Boolean, default: false },
+  // randomizable values
+  colors: { type: Types.Array, default: [{ r: 1, g: 1, b: 1 }] },
+  orientations: { type: Types.Array, default: [0] },
+  scales: { type: Types.Array, default: [1] },
+  opacities: { type: Types.Array, default: [1] },
+  frameStyle: { type: Types.String, default: "sequence" },
+  offset: { type: Types.Ref, default: { x: 0, y: 0, z: 0 } },
+  velocity: { type: Types.Ref, default: { x: 0, y: 0, z: 0 } },
+  acceleration: { type: Types.Ref, default: { x: 0, y: 0, z: 0 } },
+  radialVelocity: { type: Types.Number, default: 0 },
+  radialAcceleration: { type: Types.Number, default: 0 },
+  angularVelocity: { type: Types.Ref, default: { x: 0, y: 0, z: 0 } },
+  angularAcceleration: { type: Types.Ref, default: { x: 0, y: 0, z: 0 } },
+  orbitalVelocity: { type: Types.Number, default: 0 },
+  orbitalAcceleration: { type: Types.Number, default: 0 },
+  worldAcceleration: { type: Types.Ref, default: { x: 0, y: 0, z: 0 } },
+  brownianSpeed: { type: Types.Number, default: 0 },
+  brownianScale: { type: Types.Number, default: 0 }
+};

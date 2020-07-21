@@ -1,13 +1,15 @@
 {
-    "compilerOptions": {
-      "declaration": true,
-      "module": "es6",
-      "noImplicitAny": false,
-      "target": "es6",
-      "moduleResolution": "Node"
-    },
-    "include": [
-      "src/**/*"
-    ],
-    "exclude": ["node_modules", "examples/**"]
-  }
+  "compilerOptions": {
+    "module": "es6",
+    "declaration": true,
+    "noImplicitAny": false,
+    "target": "es6",
+    "moduleResolution": "Node",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": ["node_modules", "dist"]
+}
