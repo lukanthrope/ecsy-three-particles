@@ -17,7 +17,7 @@ import {
 export class ParticleSystem extends System {
   execute(deltaTime, time): void {
     for (const entity of this.queries.emitters.added) {
-      const emitter = entity.getComponent(ParticleEmitter)
+      const emitter = entity.getComponent(ParticleEmitter) as ParticleEmitter
       const object3D = entity.getComponent(Object3DComponent)
 
       const matrixWorld = calcMatrixWorld(entity)
@@ -34,7 +34,7 @@ export class ParticleSystem extends System {
     }
 
     for (const entity of this.queries.emitterStates.results) {
-      const emitterState = entity.getComponent(ParticleEmitterState)
+      const emitterState = entity.getComponent(ParticleEmitterState) as ParticleEmitterState
 
       if (emitterState.syncTransform) {
         const matrixWorld = calcMatrixWorld(entity)
