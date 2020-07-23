@@ -20,23 +20,6 @@
 
       const DEG2RAD = THREE.MathUtils.DEG2RAD
 
-      const sphereGeometry = new THREE.SphereBufferGeometry(0.03, 0.03)
-      const sphereMesh = new THREE.Mesh(
-        sphereGeometry,
-        new THREE.MeshStandardMaterial({ color: "yellow" })
-      )
-
-
-      const sharedParticleMesh = PARTICLES.createParticleMesh({
-        texture: "./assets/spritesheet.png",
-        particleCount: 20000,
-        alphaTest: 0.01,
-        useBrownianMotion: true,
-        useVelocityScale: true,
-        transparent: true,
-        depthWrite: false
-      })
-
       class Rotating extends ECSY.Component {}
       Rotating.schema = {
         x: { type: ECSY.Types.Number, default: 0 },
@@ -124,10 +107,10 @@
           for (let entity of this.queries.added.results) {
             const firework = entity.getComponent(Firework)
             //const emitter = entity.getComponent(PARTICLES.ParticleEmitter)
-            console.log(entity)
+            
             
             if (Date.now() - firework.birthDate > 3000) {
-              emitter.enabled = false;
+              
             }
           }
         }
@@ -162,6 +145,39 @@
           components: [Firework]
         },
       }
+
+      const sphereGeo = new THREE.ConeBufferGeometry()
+      const shpereMesh1 = new THREE.Mesh(
+        sphereGeo,
+        new THREE.MeshStandardMaterial({ color: "pink" })
+      )
+      const particleMesh = PARTICLES.createParticleMesh({
+        mesh: shpereMesh1,
+        style: "mesh",
+        particleCount: 20000,
+        alphaTest: 0.01,
+        useBrownianMotion: true,
+        useVelocityScale: true,
+        transparent: true,
+        depthWrite: false
+      })
+
+      const sphereGeometry = new THREE.SphereBufferGeometry(0.03, 0.03)
+      const sphereMesh = new THREE.Mesh(
+        sphereGeometry,
+        new THREE.MeshStandardMaterial({ color: "yellow" })
+      )
+
+
+      const sharedParticleMesh = PARTICLES.createParticleMesh({
+        texture: "./assets/spritesheet.png",
+        particleCount: 20000,
+        alphaTest: 0.01,
+        useBrownianMotion: true,
+        useVelocityScale: true,
+        transparent: true,
+        depthWrite: false
+      })
 
       const world = new ECSYTHREE.ECSYThreeWorld()
         .registerSystem(RotatingSystem)
@@ -198,9 +214,9 @@
       scene3D.add(new THREE.AmbientLight(0x404040))
       scene3D.add(new THREE.DirectionalLight())
       scene3D.add(sharedParticleMesh)
-      // scene3D.add(particleMesh)
+      scene3D.add(particleMesh)
 
-      const object = world
+      const createObject = () => world
         .createEntity()
         .addObject3DComponent(sphereMesh.clone(), scene)
         .addComponent(MoveTranslating, {
@@ -213,41 +229,81 @@
         .addComponent(ECSYTHREEX.Parent, { value: scene })
         .addComponent(Firework)
         .addComponent(PARTICLES.ParticleEmitter, {
-                particleMesh: sharedParticleMesh,
-                atlas: "explosion_sheet.png",
-                textureFrame: { cols: 5, rows: 5 },
-                frameStyle: "sequence",
-                count: 50,
-                worldUp: true,
-                syncTransform: true,
-                repeatTime: 0.01,
-                lifeTime: 2,
-                radialAcceleration: 0.1,
-                velocity: { x: 0, y: -0.02, z: 0 },
-                // worldAcceleration: { x: 0.02, y: 0, z: 0 },
-                // get offset() {
-                //   return PARTICLES.randomBoxOffset(0.5, 0.5, 0)
-                // },
-                colors: [
-                    { r: 1, g: 1, b: 1 },
-                    { r: 0.5, g: 0.5, b: 0.5 },
-                    { r: 0, g: 0, b: 0 },
-                ],
-                // opacities: [
-                //   0.75, 0
-                // ],
-                scales: [ 5, 10 ],
-                opacities: [0.5, 1, 0],
-                get orientations() {
-                  return [~~(Math.random() * 4) * 90]
-                }
-              })
+          particleMesh: sharedParticleMesh,
+          atlas: "explosion_sheet.png",
+          textureFrame: { cols: 5, rows: 5 },
+          frameStyle: "sequence",
+          count: 50,
+          worldUp: true,
+          syncTransform: true,
+          repeatTime: 0.01,
+          lifeTime: 2,
+          radialAcceleration: 0.1,
+          velocity: { x: 0, y: -0.02, z: 0 },
+          // worldAcceleration: { x: 0.02, y: 0, z: 0 },
+          // get offset() {
+          //   return PARTICLES.randomBoxOffset(0.5, 0.5, 0)
+          // },
+          colors: [
+              { r: 1, g: 1, b: 1 },
+              { r: 0.5, g: 0.5, b: 0.5 },
+              { r: 0, g: 0, b: 0 },
+          ],
+          // opacities: [
+          //   0.75, 0
+          // ],
+          scales: [ 5, 10 ],
+          opacities: [0.5, 1, 0],
+          get orientations() {
+            return [~~(Math.random() * 4) * 90]
+          }
+        })
 
-        const emitter = object.getComponent(PARTICLES.ParticleEmitter)
-        
+        //const objects = []
 
-          object.remove()
-        
+        setInterval(() => {
+          const ob = createObject()
+          console.log(ob)
+          setTimeout(() => {
+            const position = ob.getComponent(ECSYTHREEX.Transform).position
+            //console.log(ob.getComponent(ParticleEmitter))
+            
+            ob.removeComponent(PARTICLES.ParticleEmitter) 
+            ob.removeComponent(PARTICLES.ParticleEmitterState)
+
+            ob.addComponent(PARTICLES.ParticleEmitter, {
+              particleMesh: sharedParticleMesh,
+              atlas: "fireworks_sheet.png",
+              textureFrame: { cols: 5, rows: 5 },
+              frameStyle: "sequence",
+              count: 50,
+              worldUp: true,
+              syncTransform: true,
+              repeatTime: 0.01,
+              lifeTime: 2,
+              radialAcceleration: 0.1,
+              velocity: { x: 0, y: -0.02, z: 0 },
+              // worldAcceleration: { x: 0.02, y: 0, z: 0 },
+              // get offset() {
+              //   return PARTICLES.randomBoxOffset(0.5, 0.5, 0)
+              // },
+              colors: [
+                  { r: 1, g: 1, b: 1 },
+                  { r: 0.5, g: 0.5, b: 0.5 },
+                  { r: 0, g: 0, b: 0 },
+              ],
+              // opacities: [
+              //   0.75, 0
+              // ],
+              scales: [ 5, 10 ],
+              opacities: [0.5, 1, 0],
+              get orientations() {
+                return [~~(Math.random() * 4) * 90]
+              }
+            })
+          }, 500)
+        }, 1000)
+          
 
       world.execute(0.000001, 0.000001) 
     </script>
