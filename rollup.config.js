@@ -1,11 +1,13 @@
 import json from "@rollup/plugin-json"
 import resolve from "@rollup/plugin-node-resolve"
 import html from "@open-wc/rollup-plugin-html"
+import image from "@rollup/plugin-image"
 import babel from "@rollup/plugin-babel"
 import typescript from "rollup-plugin-typescript2"
 import path from 'path';
 import pkg from "./package.json"
-import serve from 'rollup-plugin-serve';
+import serve from 'rollup-plugin-serve'
+import livereload from 'rollup-plugin-livereload'
 
 export default [
   {
@@ -18,7 +20,10 @@ export default [
       // resolve(),
       // json({ exclude: ["node_modules/**", "examples/**"] }),
       // terser(),
-      babel({ babelHelpers: "bundled" }),
+      babel({ 
+        babelHelpers: "bundled",
+        extensions: ['.js', '.ts', 'png']
+      }),
       serve({
         // Folder to serve files from,
         contentBase: path.join(__dirname, 'dist/examples'),
@@ -30,6 +35,8 @@ export default [
         host: 'localhost',
         port: 4444,
       }),
+      livereload(),
+      image()
     ],
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     output: [
@@ -53,6 +60,13 @@ export default [
   },
   {
     input: "examples/firework.html",
+    output: { dir: "dist/examples" },
+    plugins: [html(), resolve()],
+    watch: {
+    },
+  },
+  {
+    input: "examples/test-task.html",
     output: { dir: "dist/examples" },
     plugins: [html(), resolve()],
     watch: {

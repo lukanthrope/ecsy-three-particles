@@ -606,25 +606,27 @@
       //   })
       //   .addComponent(ECSYTHREEX.Parent, { value: scene })
       //
-      // world
-      //   .createEntity()
-      //   .addComponent(PARTICLES.ParticleEmitter, {
-      //     particleMesh: coneParticleMesh,
-      //     atlas: 'blob.png',
-      //     count: 200,
-      //     lifeTime: 5,
-      //     get offset() {
-      //       return PARTICLES.randomSphereOffset(0.25)
-      //     },
-      //     colors: [{ r: 0, g: 1, b: 1 }],
-      //     angularVelocity: { x: 160, y: 0, z: 0 },
-      //     scales: [0.03]
-      //   })
-      //   .addComponent(ECSYTHREEX.Transform, {
-      //     position: { x: -2, y: -1, z: -4 },
-      //     rotation: { x: 0, y: 0, z: 0 }
-      //   })
-      //   .addComponent(ECSYTHREEX.Parent, { value: scene })
+      world
+         .createEntity()
+         .addComponent(PARTICLES.ParticleEmitter, {
+           particleMesh: coneParticleMesh,
+           atlas: 'blob.png',
+           count: 200,
+           lifeTime: 5,
+           get offset() {
+             return PARTICLES.randomSphereOffset(0.25)
+           },
+           colors: [{ r: 0, g: 1, b: 1 }],
+           angularVelocity: { x: 160, y: 0, z: 0 },
+           scales: [0.03]
+         })
+         .addComponent(ECSYTHREEX.Transform, {
+           position: { x: -2, y: -1, z: -4 },
+           rotation: { x: 0, y: 0, z: 0 }
+         })
+         .addComponent(ECSYTHREEX.Parent, { value: scene })
+
+         objectBox.removeComponent(PARTICLES.ParticleEmitter)
 
       world.execute(0.000001, 0.000001)
 

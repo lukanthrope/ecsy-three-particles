@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ECSY Particles</title>
+    <style>
+      html, body {
+        margin: 0;
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+      }
+    </style>
+    <script defer type="module">
+      import * as THREE from "../node_modules/three/build/three.module.js"
+      import * as ECSY from "../node_modules/ecsy"
+      import * as ECSYTHREE from "../node_modules/ecsy-three"
+      import * as ECSYTHREEX from "../node_modules/ecsy-three/extras"
+      import * as PARTICLES from "../dist/ecsy-particles.js"
+      import { OrbitControls } from "../node_modules/three/examples/jsm/controls/OrbitControls"
+
+      const DEG2RAD = THREE.MathUtils.DEG2RAD
+
+      const sphereGeometry = new THREE.SphereBufferGeometry(0.03, 0.03)
+      const sphereMesh = new THREE.Mesh(
+        sphereGeometry,
+        new THREE.MeshStandardMaterial({ color: "yellow" })
+      )
+
+
+      const sharedParticleMesh = PARTICLES.createParticleMesh({
+        texture: "./assets/spritesheet.png",
+        particleCount: 20000,
+        alphaTest: 0.01,
+        useBrownianMotion: true,
+        useVelocityScale: true,
+        transparent: true,
+        depthWrite: false
+      })
+
+      class Rotating extends ECSY.Component {}
+      Rotating.schema = {
+        x: { type: ECSY.Types.Number, default: 0 },
+        y: { type: ECSY.Types.Number, default: 0 },
+        z: { type: ECSY.Types.Number, default: 0 }
+      }
+
+      class RotatingSystem extends ECSY.System {
+        execute(dt) {
+          for (let entity of this.queries.rotating.results) {
+            const rotating = entity.getComponent(Rotating)
+            /** @type {ECSYTHREEX.Transform} */
+            const transform = entity.getMutableComponent(ECSYTHREEX.Transform)
+            transform.rotation.x += rotating.x * dt * DEG2RAD
+            transform.rotation.y += rotating.y * dt * DEG2RAD
+            transform.rotation.z += rotating.z * dt * DEG2RAD
+          }
+        }
+      }
+
+      RotatingSystem.queries = {
+        rotating: {
+          components: [Rotating, ECSYTHREEX.Transform]
+        }
+      }
+
+      class Translating extends ECSY.Component {}
+      Translating.schema = {
+        x: { type: ECSY.Types.Number, default: 0 },
+        y: { type: ECSY.Types.Number, default: 0 },
+        z: { type: ECSY.Types.Number, default: 0 }
+      }
+
+      class TranslatingSystem extends ECSY.System {
+        execute(dt, t) {
+          for (let entity of this.queries.translating.results) {
+            const translating = entity.getComponent(Translating)
+            /** @type {ECSYTHREEX.Transform} */
+            const transform = entity.getMutableComponent(ECSYTHREEX.Transform)
+            transform.position.x += translating.x * (dt)
+            transform.position.y += translating.y * (dt)
+            transform.position.z += translating.z * (dt)
+          }
+        }
+      }
+
+      TranslatingSystem.queries = {
+        translating: {
+          components: [Translating, ECSYTHREEX.Transform]
+        }
+      }
+
+      class MoveTranslating extends ECSY.Component {}
+      MoveTranslating.schema = {
+        speed: { type: ECSY.Types.Number, default: 1 }
+      }
+
+      class MoveTranslatingSystem extends ECSY.System {
+        execute(dt, t) {
+          for (let entity of this.queries.translating.results) {
+            const translating = entity.getComponent(MoveTranslating)
+            
+            /** @type {ECSYTHREEX.Transform} */
+            const transform = entity.getMutableComponent(ECSYTHREEX.Transform)
+
+            transform.position.x += translating.speed
+            transform.position.z += translating.speed
+          }
+        }
+      }
+
+      MoveTranslatingSystem.queries = {
+        translating: {
+          components: [MoveTranslating, ECSYTHREEX.Transform]
+        }
+      }
+
+      class Firework extends ECSY.Component {}
+      Firework.schema = {
+        birthDate: { type: ECSY.Types.Number, default: Date.now() }
+      }
+
+      class FireworkSystem extends ECSY.System {
+        execute(dt, t) {
+          for (let entity of this.queries.added.results) {
+            const firework = entity.getComponent(Firework)
+            //const emitter = entity.getComponent(PARTICLES.ParticleEmitter)
+            console.log(entity)
+            
+            if (Date.now() - firework.birthDate > 3000) {
+              emitter.enabled = false;
+            }
+          }
+        }
+      }
+
+      FireworkSystem.queries = {
+        added: {
+          components: [Firework, ]
+        },
+      }
+
+      class FireworkExplosionSystem extends ECSY.System {
+        execute(dt, t) {
+          for (let entity of this.queries.props.results) {
+            const firework = entity.getComponent(Firework)
+            // const emitter = entity.getMutableComponent(PARTICLES.ParticleEmitter)
+            
+            
+            if (Date.now() - firework.birthDate > 4000) {
+              
+               
+              
+              
+              //entity.remove();
+            }
+          }
+        }
+      }
+
+      FireworkExplosionSystem.queries = {
+        props: {
+          components: [Firework]
+        },
+      }
+
+      const world = new ECSYTHREE.ECSYThreeWorld()
+        .registerSystem(RotatingSystem)
+        .registerSystem(TranslatingSystem)
+        .registerSystem(MoveTranslatingSystem)
+        .registerSystem(FireworkSystem)
+        .registerSystem(FireworkExplosionSystem)
+        .registerComponent(ECSYTHREEX.Transform)
+        .registerComponent(Rotating)
+        .registerComponent(Translating)
+        .registerComponent(MoveTranslating)
+        .registerComponent(Firework)
+
+      PARTICLES.initializeParticleSystem(world)
+
+      const data = ECSYTHREEX.initialize(world, { vr: false })
+
+      const { scene, renderer, camera } = data.entities
+
+      const cam = camera.getComponent(ECSYTHREE.Object3DComponent)["value"]
+      cam.position.set(-1,0.5,-1).multiplyScalar(0.5)
+      cam.lookAt(new THREE.Vector3())
+
+      setTimeout(() => {
+        const domElement = document.body.querySelector("canvas")
+        const controls = new OrbitControls(cam, domElement)
+      }, 0)
+
+      
+      const scene3D = scene.getComponent(ECSYTHREE.Object3DComponent)["value"]
+
+      scene3D.add(new THREE.AxesHelper())
+      scene3D.add(new THREE.GridHelper(2,1))
+      scene3D.add(new THREE.AmbientLight(0x404040))
+      scene3D.add(new THREE.DirectionalLight())
+      scene3D.add(sharedParticleMesh)
+      // scene3D.add(particleMesh)
+
+      const object = world
+        .createEntity()
+        .addObject3DComponent(sphereMesh.clone(), scene)
+        .addComponent(MoveTranslating, {
+          speed: 0.01
+        })
+        .addComponent(ECSYTHREEX.Transform, {
+          position: { x: 0, y: -0.5, z: 0 },
+          rotation: { x: 0, y: 0, z: 0 }
+        })
+        .addComponent(ECSYTHREEX.Parent, { value: scene })
+        .addComponent(Firework)
+        .addComponent(PARTICLES.ParticleEmitter, {
+                particleMesh: sharedParticleMesh,
+                atlas: "explosion_sheet.png",
+                textureFrame: { cols: 5, rows: 5 },
+                frameStyle: "sequence",
+                count: 50,
+                worldUp: true,
+                syncTransform: true,
+                repeatTime: 0.01,
+                lifeTime: 2,
+                radialAcceleration: 0.1,
+                velocity: { x: 0, y: -0.02, z: 0 },
+                // worldAcceleration: { x: 0.02, y: 0, z: 0 },
+                // get offset() {
+                //   return PARTICLES.randomBoxOffset(0.5, 0.5, 0)
+                // },
+                colors: [
+                    { r: 1, g: 1, b: 1 },
+                    { r: 0.5, g: 0.5, b: 0.5 },
+                    { r: 0, g: 0, b: 0 },
+                ],
+                // opacities: [
+                //   0.75, 0
+                // ],
+                scales: [ 5, 10 ],
+                opacities: [0.5, 1, 0],
+                get orientations() {
+                  return [~~(Math.random() * 4) * 90]
+                }
+              })
+
+        const emitter = object.getComponent(PARTICLES.ParticleEmitter)
+        
+
+          object.remove()
+        
+
+      world.execute(0.000001, 0.000001) 
+    </script>
+  </head>
+  <body></body>
+</html>
