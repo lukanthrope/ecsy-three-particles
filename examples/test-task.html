@@ -20,6 +20,39 @@
 
       const DEG2RAD = THREE.MathUtils.DEG2RAD
 
+      const sphereGeo = new THREE.ConeBufferGeometry()
+      const shpereMesh1 = new THREE.Mesh(
+        sphereGeo,
+        new THREE.MeshStandardMaterial({ color: "pink" })
+      )
+      const particleMesh = PARTICLES.createParticleMesh({
+        mesh: shpereMesh1,
+        style: "mesh",
+        particleCount: 20000,
+        alphaTest: 0.01,
+        useBrownianMotion: true,
+        useVelocityScale: true,
+        transparent: true,
+        depthWrite: false
+      })
+
+      const sphereGeometry = new THREE.SphereBufferGeometry(0.001, 0.001)
+      const sphereMesh = new THREE.Mesh(
+        sphereGeometry,
+        new THREE.MeshStandardMaterial({ color: "yellow" })
+      )
+
+
+      const sharedParticleMesh = PARTICLES.createParticleMesh({
+        texture: "./assets/spritesheet.png",
+        particleCount:  20000,
+        alphaTest: 0.01,
+        useBrownianMotion: true,
+        useVelocityScale: true,
+        transparent: true,
+        depthWrite: false
+      })
+
       class Rotating extends ECSY.Component {}
       Rotating.schema = {
         x: { type: ECSY.Types.Number, default: 0 },
@@ -85,8 +118,8 @@
             /** @type {ECSYTHREEX.Transform} */
             const transform = entity.getMutableComponent(ECSYTHREEX.Transform)
 
-            transform.position.x += translating.speed
-            transform.position.z += translating.speed
+            transform.position.x += translating.speed / 2
+            transform.position.y += translating.speed
           }
         }
       }
@@ -109,7 +142,10 @@
             //const emitter = entity.getComponent(PARTICLES.ParticleEmitter)
             
             
-            if (Date.now() - firework.birthDate > 3000) {
+            if (Date.now() - firework.birthDate > 5000) {
+              entity.removeComponent(PARTICLES.ParticleEmitterState)
+              entity.removeComponent(PARTICLES.ParticleEmitter) 
+              
               
             }
           }
@@ -128,11 +164,43 @@
             const firework = entity.getComponent(Firework)
             // const emitter = entity.getMutableComponent(PARTICLES.ParticleEmitter)
             
+            if (Date.now() - firework.birthDate > 5405) {
+                entity.removeAllComponents()
+                entity.remove()
+            } else
             
-            if (Date.now() - firework.birthDate > 4000) {
-              
-               
-              
+            if (Date.now() - firework.birthDate > 5200) {
+              console.log('here')
+              entity.addComponent(PARTICLES.ParticleEmitter, {
+                particleMesh: sharedParticleMesh,
+                atlas: "fireworks_sheet.png",
+                textureFrame: { cols: 5, rows: 5 },
+                frameStyle: "sequence",
+                count: 50,
+                worldUp: true,
+                syncTransform: true,
+                repeatTime: 0.01,
+                lifeTime: 2,
+                radialAcceleration: 0.1,
+                velocity: { x: 0, y: -0.02, z: 0 },
+                // worldAcceleration: { x: 0.02, y: 0, z: 0 },
+                // get offset() {
+                //   return PARTICLES.randomBoxOffset(0.5, 0.5, 0)
+                // },
+                colors: [
+                    { r: 1, g: 1, b: 1 },
+                    { r: 0.5, g: 0.5, b: 0.5 },
+                    { r: 0, g: 0, b: 0 },
+                ],
+                // opacities: [
+                //   0.75, 0
+                // ],
+                scales: [ 5, 10 ],
+                opacities: [0.5, 1, 0],
+                get orientations() {
+                  return [~~(Math.random() * 4) * 90]
+                }
+              })
               
               //entity.remove();
             }
@@ -146,38 +214,7 @@
         },
       }
 
-      const sphereGeo = new THREE.ConeBufferGeometry()
-      const shpereMesh1 = new THREE.Mesh(
-        sphereGeo,
-        new THREE.MeshStandardMaterial({ color: "pink" })
-      )
-      const particleMesh = PARTICLES.createParticleMesh({
-        mesh: shpereMesh1,
-        style: "mesh",
-        particleCount: 20000,
-        alphaTest: 0.01,
-        useBrownianMotion: true,
-        useVelocityScale: true,
-        transparent: true,
-        depthWrite: false
-      })
-
-      const sphereGeometry = new THREE.SphereBufferGeometry(0.03, 0.03)
-      const sphereMesh = new THREE.Mesh(
-        sphereGeometry,
-        new THREE.MeshStandardMaterial({ color: "yellow" })
-      )
-
-
-      const sharedParticleMesh = PARTICLES.createParticleMesh({
-        texture: "./assets/spritesheet.png",
-        particleCount: 20000,
-        alphaTest: 0.01,
-        useBrownianMotion: true,
-        useVelocityScale: true,
-        transparent: true,
-        depthWrite: false
-      })
+      
 
       const world = new ECSYTHREE.ECSYThreeWorld()
         .registerSystem(RotatingSystem)
@@ -227,7 +264,7 @@
           rotation: { x: 0, y: 0, z: 0 }
         })
         .addComponent(ECSYTHREEX.Parent, { value: scene })
-        .addComponent(Firework)
+        .addComponent(Firework, { birthDate: Date.now() })
         .addComponent(PARTICLES.ParticleEmitter, {
           particleMesh: sharedParticleMesh,
           atlas: "explosion_sheet.png",
@@ -238,6 +275,11 @@
           syncTransform: true,
           repeatTime: 0.01,
           lifeTime: 2,
+          offset: {
+            x: 0,
+            y: -0.5,
+            z: 0,
+          },
           radialAcceleration: 0.1,
           velocity: { x: 0, y: -0.02, z: 0 },
           // worldAcceleration: { x: 0.02, y: 0, z: 0 },
@@ -264,45 +306,8 @@
         setInterval(() => {
           const ob = createObject()
           console.log(ob)
-          setTimeout(() => {
-            const position = ob.getComponent(ECSYTHREEX.Transform).position
-            //console.log(ob.getComponent(ParticleEmitter))
-            
-            ob.removeComponent(PARTICLES.ParticleEmitter) 
-            ob.removeComponent(PARTICLES.ParticleEmitterState)
 
-            ob.addComponent(PARTICLES.ParticleEmitter, {
-              particleMesh: sharedParticleMesh,
-              atlas: "fireworks_sheet.png",
-              textureFrame: { cols: 5, rows: 5 },
-              frameStyle: "sequence",
-              count: 50,
-              worldUp: true,
-              syncTransform: true,
-              repeatTime: 0.01,
-              lifeTime: 2,
-              radialAcceleration: 0.1,
-              velocity: { x: 0, y: -0.02, z: 0 },
-              // worldAcceleration: { x: 0.02, y: 0, z: 0 },
-              // get offset() {
-              //   return PARTICLES.randomBoxOffset(0.5, 0.5, 0)
-              // },
-              colors: [
-                  { r: 1, g: 1, b: 1 },
-                  { r: 0.5, g: 0.5, b: 0.5 },
-                  { r: 0, g: 0, b: 0 },
-              ],
-              // opacities: [
-              //   0.75, 0
-              // ],
-              scales: [ 5, 10 ],
-              opacities: [0.5, 1, 0],
-              get orientations() {
-                return [~~(Math.random() * 4) * 90]
-              }
-            })
-          }, 500)
-        }, 1000)
+        }, 5000)
           
 
       world.execute(0.000001, 0.000001) 
