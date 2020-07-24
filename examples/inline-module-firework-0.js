@@ -65535,4 +65535,3 @@ const DEG2RAD$1 = MathUtils.DEG2RAD;
       // set the background color, must be after the first execute
       // const renderer3D = renderer.getComponent(ECSYTHREE.WebGLRendererContext).value;
       // renderer3D.setClearColor(new THREE.Color(0x111111), 1.)
-//# sourceMappingURL=inline-module-firework-0.js.map
