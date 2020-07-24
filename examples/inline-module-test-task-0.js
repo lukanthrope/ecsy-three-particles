@@ -65203,3 +65203,4 @@ const DEG2RAD$1 = MathUtils.DEG2RAD;
           
 
       world.execute(0.000001, 0.000001);
+//# sourceMappingURL=inline-module-test-task-0.js.map
