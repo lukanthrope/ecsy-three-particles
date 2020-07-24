@@ -3,7 +3,7 @@ A particle system for ECSY and three.js in Typescript, inspired by / heavily cop
 
 # live demo
 
-[Fireworks] (https://lukanthrope.github.io/ecsy-three-particles/test-task.html)
+[Fireworks](https://lukanthrope.github.io/ecsy-three-particles/test-task.html)
 
 # Installation
 ```
