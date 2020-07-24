@@ -1,6 +1,10 @@
 # ecsy-three-particles
 A particle system for ECSY and three.js in Typescript, inspired by / heavily copied from https://github.com/harlyq
 
+# live demo
+
+[Fireworks] (https://lukanthrope.github.io/ecsy-three-particles/test-task.html)
+
 # Installation
 ```
 npm install ecsy-three-particles
