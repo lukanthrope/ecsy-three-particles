@@ -22,22 +22,6 @@
       const world = new ECSYTHREE.ECSYThreeWorld()
       const data = ECSYTHREEX.initialize(world, { vr: false })
 
-      const sphereGeo = new THREE.ConeBufferGeometry()
-      const shpereMesh1 = new THREE.Mesh(
-        sphereGeo,
-        new THREE.MeshStandardMaterial({ color: "pink" })
-      )
-      const particleMesh = PARTICLES.createParticleMesh({
-        mesh: shpereMesh1,
-        style: "mesh",
-        particleCount: 20000,
-        alphaTest: 0.01,
-        useBrownianMotion: true,
-        useVelocityScale: true,
-        transparent: true,
-        depthWrite: false
-      })
-
       const sphereGeometry = new THREE.SphereBufferGeometry(0.001, 0.001)
       const sphereMesh = new THREE.Mesh(
         sphereGeometry,
@@ -54,21 +38,13 @@
         depthWrite: false
       }
 
-      const sharedParticleMesh = PARTICLES.createParticleMesh(pMeshConfig)
-
-      const expParticleMesh = PARTICLES.createParticleMesh(pMeshConfig)
-
       const { scene, renderer, camera } = data.entities
 
       const scene3D = scene.getComponent(ECSYTHREE.Object3DComponent)["value"]
 
-      scene3D.add(new THREE.AxesHelper())
-      scene3D.add(new THREE.GridHelper(2,1))
       scene3D.add(new THREE.AmbientLight(0x404040))
       scene3D.add(new THREE.DirectionalLight())
-      // scene3D.add(sharedParticleMesh)
-      scene3D.add(particleMesh)
-
+      
 
       class Rotating extends ECSY.Component {}
       Rotating.schema = {
@@ -124,7 +100,8 @@
 
       class MoveTranslating extends ECSY.Component {}
       MoveTranslating.schema = {
-        speed: { type: ECSY.Types.Number, default: 1 }
+        speed: { type: ECSY.Types.Number, default: 1 },
+        direction: { type: ECSY.Types.String, default: 'x' }
       }
 
       class MoveTranslatingSystem extends ECSY.System {
@@ -135,7 +112,21 @@
             /** @type {ECSYTHREEX.Transform} */
             const transform = entity.getMutableComponent(ECSYTHREEX.Transform)
 
-            transform.position.x += translating.speed / 2
+            const XorZ = THREE.Math.randInt(1, 2)
+
+            if (translating.direction === 'x') {
+
+              if (XorZ === 1)
+                transform.position.x += translating.speed
+              else 
+                transform.position.z += translating.speed / THREE.Math.randFloat(3, 6)
+            } else {
+              if (XorZ === 1)
+                transform.position.x += translating.speed / THREE.Math.randFloat(3, 6)
+              else 
+                transform.position.z += translating.speed
+            }
+            
             transform.position.y += translating.speed
           }
         }
@@ -149,58 +140,31 @@
 
       class Firework extends ECSY.Component {}
       Firework.schema = {
-        birthDate: { type: ECSY.Types.Number, default: Date.now() }
+        birthDate: { type: ECSY.Types.Number, default: Date.now() },
+        lifeTime: { type: ECSY.Types.Number, default: 2600 },
+        effect: { type: ECSY.Types.Ref, default: null },
       }
 
       class FireworkSystem extends ECSY.System {
-        init() {
-          scene3D.add(sharedParticleMesh)
-        }
         execute(dt, t) {
           for (let entity of this.queries.removed.results) {
             const firework = entity.getComponent(Firework)
         
-            if (Date.now() - firework.birthDate > 3000) {
+            if (Date.now() - firework.birthDate > 2000) {
               entity.removeComponent(PARTICLES.ParticleEmitter) 
-              scene3D.remove(sharedParticleMesh)
-            }
+              scene3D.remove(firework.effect)
+            } 
           }
-        }
-      }
 
-      FireworkSystem.queries = {
-        removed: {
-          components: [Firework, ]
-        },
-      }
-
-      class FireworkExplosion extends ECSY.Component {}
-      FireworkExplosion.schema = {
-        effect: { type: ECSY.Types.Ref, default: null }
-      }
-
-      class FireworkExplosionSystem extends ECSY.System {
-        execute(dt, t) {
           for (let entity of this.queries.added.results) {
             const firework = entity.getComponent(Firework)
-            const fireworkSystem = entity.getComponent(FireworkExplosion)
-            console.log(fireworkSystem)
-              console.log(sharedParticleMesh)
-            if (Date.now() - firework.birthDate > 4000) {
-              console.log(entity)
-                //entity.removeAllComponents()
-                scene3D.remove(fireworkSystem.effect)
-                entity.remove()
-                console.log(entity)
-            } else
-            
-            if (Date.now() - firework.birthDate > 3100) {
-              scene3D.add(fireworkSystem.effect)
-              console.log(fireworkSystem.effect)
-              console.log(sharedParticleMesh)
-              entity.addComponent(PARTICLES.ParticleEmitter, {
-                particleMesh: fireworkSystem.effect,
-                atlas: "fireworks_sheet.png",
+
+            if (!entity.hasComponent(PARTICLES.ParticleEmitter) && Date.now() - firework.birthDate < 1000) {
+              scene3D.add(firework.effect)
+              entity
+              .addComponent(PARTICLES.ParticleEmitter, {
+                particleMesh: firework.effect,
+                atlas: "explosion_sheet.png",
                 textureFrame: { cols: 5, rows: 5 },
                 frameStyle: "sequence",
                 count: 50,
@@ -210,26 +174,78 @@
                 lifeTime: 2,
                 radialAcceleration: 0.1,
                 velocity: { x: 0, y: -0.02, z: 0 },
-                // worldAcceleration: { x: 0.02, y: 0, z: 0 },
-                // get offset() {
-                //   return PARTICLES.randomBoxOffset(0.5, 0.5, 0)
-                // },
                 colors: [
                     { r: 1, g: 1, b: 1 },
                     { r: 0.5, g: 0.5, b: 0.5 },
                     { r: 0, g: 0, b: 0 },
                 ],
-                // opacities: [
-                //   0.75, 0
-                // ],
                 scales: [ 5, 10 ],
                 opacities: [0.5, 1, 0],
                 get orientations() {
                   return [~~(Math.random() * 4) * 90]
                 }
               })
-              
-              //entity.remove();
+            }
+          }
+        }
+      }
+
+      FireworkSystem.queries = {
+        added: {
+          components: [Firework]
+        },
+        removed: {
+          components: [Firework]
+        }
+      }
+
+      class FireworkExplosion extends ECSY.Component {}
+      FireworkExplosion.schema = {
+        effect: { type: ECSY.Types.Ref, default: null }
+      }
+
+      class FireworkExplosionSystem extends ECSY.System {
+        execute(dt, t) {
+          for (let entity of this.queries.removed.results) {
+            const fireworkExp = entity.getComponent(FireworkExplosion)
+            const firework = entity.getComponent(Firework)
+
+            if (Date.now() - firework.birthDate > firework.lifeTime) {
+              scene3D.remove(fireworkExp.effect)
+              if (entity)
+                entity.remove()
+            } 
+          }
+            
+          for (let entity of this.queries.added.results) {
+            const firework = entity.getComponent(Firework)
+            const fireworkExp = entity.getComponent(FireworkExplosion)
+
+            if (Date.now() - firework.birthDate > 2100 && Date.now() - firework.birthDate < firework.lifeTime) {
+              scene3D.add(fireworkExp.effect)
+              entity.addComponent(PARTICLES.ParticleEmitter, {
+                particleMesh: fireworkExp.effect,
+                atlas: "fireworks_sheet.png",
+                textureFrame: { cols: 5, rows: 5 },
+                frameStyle: "sequence",
+                count: 100,
+                worldUp: true,
+                syncTransform: true,
+                repeatTime: 0.01,
+                lifeTime: 2,
+                radialAcceleration: 0.1,
+                velocity: { x: 0, y: -0.02, z: 0 },
+                colors: [
+                    { r: 1, g: 1, b: 1 },
+                    { r: 0.5, g: 0.5, b: 0.5 },
+                    { r: 0, g: 0, b: 0 },
+                ],
+                scales: [ 5, 10 ],
+                opacities: [0.5, 1, 0],
+                get orientations() {
+                  return [~~(Math.random() * 4) * 90]
+                }
+              })
             }
           }
         }
@@ -240,11 +256,9 @@
           components: [Firework, FireworkExplosion]
         },
         removed: {
-          components: [FireworkExplosion]
+          components: [Firework, FireworkExplosion]
         }
       }
-
-      
 
       world
         .registerSystem(RotatingSystem)
@@ -273,64 +287,29 @@
         const controls = new OrbitControls(cam, domElement)
       }, 0)
 
-      const getRandomPosition = () => ({
-        x: THREE.Math.randFloat(-5, 5),
-        y: -2,
-        z: THREE.Math.randFloat(-5, 5)
-      })
+      const getRandomPosition = () => THREE.Math.randFloat(-0.3, 0.3)
 
-      const createObject = () => world
+      const createObject = direction => world
         .createEntity()
         .addObject3DComponent(sphereMesh.clone(), scene)
         .addComponent(MoveTranslating, {
-          speed: 0.01
+          speed: 0.01,
+          direction
         })
         .addComponent(ECSYTHREEX.Transform, {
-          position: getRandomPosition(),
+          position: { x: getRandomPosition(), y: -1, z: getRandomPosition() },
           rotation: { x: 0, y: 0, z: 0 }
         })
         .addComponent(ECSYTHREEX.Parent, { value: scene })
-        .addComponent(Firework, { birthDate: Date.now() })
+        .addComponent(Firework, { birthDate: Date.now(), effect: PARTICLES.createParticleMesh(pMeshConfig) })
         .addComponent(FireworkExplosion, { effect: PARTICLES.createParticleMesh(pMeshConfig) })
-        .addComponent(PARTICLES.ParticleEmitter, {
-          particleMesh: sharedParticleMesh,
-          atlas: "explosion_sheet.png",
-          textureFrame: { cols: 5, rows: 5 },
-          frameStyle: "sequence",
-          count: 50,
-          worldUp: true,
-          syncTransform: true,
-          repeatTime: 0.01,
-          lifeTime: 2,
-          offset: {
-            x: 0,
-            y: -0.5,
-            z: 0,
-          },
-          radialAcceleration: 0.1,
-          velocity: { x: 0, y: -0.02, z: 0 },
-          // worldAcceleration: { x: 0.02, y: 0, z: 0 },
-          // get offset() {
-          //   return PARTICLES.randomBoxOffset(0.5, 0.5, 0)
-          // },
-          colors: [
-              { r: 1, g: 1, b: 1 },
-              { r: 0.5, g: 0.5, b: 0.5 },
-              { r: 0, g: 0, b: 0 },
-          ],
-          // opacities: [
-          //   0.75, 0
-          // ],
-          scales: [ 5, 10 ],
-          opacities: [0.5, 1, 0],
-          get orientations() {
-            return [~~(Math.random() * 4) * 90]
-          }
-        })
+        
 
         setInterval(() => {
-          createObject()
-        }, 3000)
+          const direction = THREE.Math.randInt(1, 2) === 1 ? 'x': 'z'
+          
+          createObject(direction)
+        }, 2000)
           
 
       world.execute(0.000001, 0.000001) 
