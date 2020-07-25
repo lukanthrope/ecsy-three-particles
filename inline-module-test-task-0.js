@@ -64920,6 +64920,7 @@ const DEG2RAD$1 = MathUtils.DEG2RAD;
 
       const pMeshConfig = {
         texture: "./assets/spritesheet.png",
+        minFilter: LinearFilter,
         particleCount:  20000,
         alphaTest: 0.01,
         useBrownianMotion: true,
@@ -65041,7 +65042,10 @@ const DEG2RAD$1 = MathUtils.DEG2RAD;
             const firework = entity.getComponent(Firework);
         
             if (Date.now() - firework.birthDate > 2000) {
+              entity.removeComponent(ParticleEmitterState);
               entity.removeComponent(ParticleEmitter); 
+              if (!entity.hasComponent(FireworkExplosion))
+                entity.addComponent(FireworkExplosion, { effect: createParticleMesh(pMeshConfig) });
               scene3D.remove(firework.effect);
             } 
           }
@@ -65100,18 +65104,23 @@ const DEG2RAD$1 = MathUtils.DEG2RAD;
             const fireworkExp = entity.getComponent(FireworkExplosion);
             const firework = entity.getComponent(Firework);
 
-            if (Date.now() - firework.birthDate > firework.lifeTime) {
-              scene3D.remove(fireworkExp.effect);
-              if (entity)
+            try {
+              if (Date.now() - firework.birthDate > firework.lifeTime && entity) {
+                scene3D.remove(fireworkExp.effect);
+                //entity.removeComponent(PARTICLES.ParticleEmitterState)
+                //entity.removeComponent(PARTICLES.ParticleEmitter)
                 entity.remove();
-            } 
+              } 
+            } catch(err) {}
           }
             
           for (let entity of this.queries.added.results) {
             const firework = entity.getComponent(Firework);
             const fireworkExp = entity.getComponent(FireworkExplosion);
 
-            if (Date.now() - firework.birthDate > 2100 && Date.now() - firework.birthDate < firework.lifeTime) {
+            if (!entity.hasComponent(ParticleEmitter) 
+              && Date.now() - firework.birthDate > 2100 
+              && Date.now() - firework.birthDate < firework.lifeTime) {
               scene3D.add(fireworkExp.effect);
               entity.addComponent(ParticleEmitter, {
                 particleMesh: fireworkExp.effect,
@@ -65157,7 +65166,6 @@ const DEG2RAD$1 = MathUtils.DEG2RAD;
         .registerSystem(FireworkSystem)
         .registerSystem(FireworkExplosionSystem)
         .registerComponent(Transform)
-        .registerComponent(ParticleEmitter)
         .registerComponent(Rotating)
         .registerComponent(Translating)
         .registerComponent(MoveTranslating)
@@ -65191,8 +65199,7 @@ const DEG2RAD$1 = MathUtils.DEG2RAD;
           rotation: { x: 0, y: 0, z: 0 }
         })
         .addComponent(Parent, { value: scene })
-        .addComponent(Firework, { birthDate: Date.now(), effect: createParticleMesh(pMeshConfig) })
-        .addComponent(FireworkExplosion, { effect: createParticleMesh(pMeshConfig) });
+        .addComponent(Firework, { birthDate: Date.now(), effect: createParticleMesh(pMeshConfig) });
         
 
         setInterval(() => {
