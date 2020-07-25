@@ -30,6 +30,7 @@
 
       const pMeshConfig = {
         texture: "./assets/spritesheet.png",
+        minFilter: THREE.LinearFilter,
         particleCount:  20000,
         alphaTest: 0.01,
         useBrownianMotion: true,
@@ -151,7 +152,10 @@
             const firework = entity.getComponent(Firework)
         
             if (Date.now() - firework.birthDate > 2000) {
+              entity.removeComponent(PARTICLES.ParticleEmitterState)
               entity.removeComponent(PARTICLES.ParticleEmitter) 
+              if (!entity.hasComponent(FireworkExplosion))
+                entity.addComponent(FireworkExplosion, { effect: PARTICLES.createParticleMesh(pMeshConfig) })
               scene3D.remove(firework.effect)
             } 
           }
@@ -210,18 +214,21 @@
             const fireworkExp = entity.getComponent(FireworkExplosion)
             const firework = entity.getComponent(Firework)
 
-            if (Date.now() - firework.birthDate > firework.lifeTime) {
-              scene3D.remove(fireworkExp.effect)
-              if (entity)
+            try {
+              if (Date.now() - firework.birthDate > firework.lifeTime && entity) {
+                scene3D.remove(fireworkExp.effect)
                 entity.remove()
-            } 
+              } 
+            } catch(err) {}
           }
             
           for (let entity of this.queries.added.results) {
             const firework = entity.getComponent(Firework)
             const fireworkExp = entity.getComponent(FireworkExplosion)
 
-            if (Date.now() - firework.birthDate > 2100 && Date.now() - firework.birthDate < firework.lifeTime) {
+            if (!entity.hasComponent(PARTICLES.ParticleEmitter) 
+              && Date.now() - firework.birthDate > 2100 
+              && Date.now() - firework.birthDate < firework.lifeTime) {
               scene3D.add(fireworkExp.effect)
               entity.addComponent(PARTICLES.ParticleEmitter, {
                 particleMesh: fireworkExp.effect,
@@ -267,7 +274,6 @@
         .registerSystem(FireworkSystem)
         .registerSystem(FireworkExplosionSystem)
         .registerComponent(ECSYTHREEX.Transform)
-        .registerComponent(PARTICLES.ParticleEmitter)
         .registerComponent(Rotating)
         .registerComponent(Translating)
         .registerComponent(MoveTranslating)
@@ -302,7 +308,6 @@
         })
         .addComponent(ECSYTHREEX.Parent, { value: scene })
         .addComponent(Firework, { birthDate: Date.now(), effect: PARTICLES.createParticleMesh(pMeshConfig) })
-        .addComponent(FireworkExplosion, { effect: PARTICLES.createParticleMesh(pMeshConfig) })
         
 
         setInterval(() => {
